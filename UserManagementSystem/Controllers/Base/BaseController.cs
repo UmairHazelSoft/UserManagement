@@ -11,7 +11,6 @@ namespace UserManagementSystem.Controllers.Base
         /// </summary>
         protected IActionResult HandleResponse<T>(ApiResponse<T> response)
         {
-            // Always use StatusCode from ApiResponse
             return StatusCode((int)response.StatusCode, response);
         }
     }

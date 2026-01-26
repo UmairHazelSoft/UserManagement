@@ -1,9 +1,14 @@
-﻿namespace UserManagementSystem.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace UserManagementSystem.DTOs
 {
     public class SetPasswordDto
     {
+        [Required]
         public int userID { get; set; }
-        public string Token { get; set; }  // Password reset token generated after email confirm
+        [Required]
+        public string Token { get; set; }  
+        [Required]
         public string NewPassword { get; set; }
     }
 }

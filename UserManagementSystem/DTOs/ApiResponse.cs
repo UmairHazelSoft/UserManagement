@@ -6,11 +6,11 @@ namespace UserManagementSystem.DTOs
 {
     public class ApiResponse<T>
     {
-        public bool Success { get; set; }      // true if request succeeded
-        public string Message { get; set; }    // optional message
-        public T Data { get; set; }            // generic payload
+        public bool Success { get; set; }     
+        public string Message { get; set; }    
+        public T Data { get; set; }            
 
-        [JsonIgnore] // will not appear in response body
+        [JsonIgnore] 
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
 
         public ApiResponse() { }

@@ -15,7 +15,7 @@ namespace UserManagementSystem.Sender.Email
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            // Get SMTP settings from appsettings.json
+            
             string smtpHost = AppSettings.SmtpHost ;
             int smtpPort = AppSettings.SmtpPort;
             string smtpUser = AppSettings.SmtpUser;

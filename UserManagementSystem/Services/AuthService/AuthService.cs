@@ -79,16 +79,20 @@ namespace UserManagementSystem.Services.AuthService
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var encodedToken = Uri.EscapeDataString(token);
 
-                var confirmUrl = $"{AppSettings.ConfirmEmailUrl}?userId={(user.Id.ToString())}&token={encodedToken}";
+                //    var confirmUrl = $"{AppSettings.ConfirmEmailUrl}?userId={(user.Id.ToString())}&token={encodedToken}";
 
 
-                var emailBody = $@"
-                <h3>Email Confirmation</h3>
-                <p>Please click the link below to confirm your email:</p>
-                <a href='{confirmUrl}'>Confirm Email</a>
-                <br/><br/>
-                <p>If you did not request this, please ignore this email.</p>
-            ";
+                //    var emailBody = $@"
+                //    <h3>Email Confirmation</h3>
+                //    <p>Please click the link below to confirm your email:</p>
+                //    <a href='{confirmUrl}'>Confirm Email</a>
+                //    <br/><br/>
+                //    <p>If you did not request this, please ignore this email.</p>
+                //";
+                var confirmUrl = $"{AppSettings.ConfirmEmailUrl}?userId={user.Id}&token={Uri.EscapeDataString(encodedToken)}";
+
+                // Get template from AppSettings and replace placeholder
+                var emailBody = AppSettings.ConfirmEmailTemplate.Replace("{ConfirmUrl}", confirmUrl);
 
                 // 📧 SEND EMAIL
                 await _emailSender.SendEmailAsync(

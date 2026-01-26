@@ -5,7 +5,6 @@
     {
         private static IConfiguration _configuration;
 
-        // Initialize at startup
         public static void Init(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -29,6 +28,9 @@
 
         // Confirm Email URL
         public static string ConfirmEmailUrl => _configuration["ConfirmEmailUrl"];
+        // Email template
+        public static string ConfirmEmailTemplate => _configuration["EmailTemplates:ConfirmEmail"];
+
     }
 
 
