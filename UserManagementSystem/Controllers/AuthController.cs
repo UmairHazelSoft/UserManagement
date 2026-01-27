@@ -16,12 +16,12 @@ namespace UserManagementSystem.Controllers
         {
             _authService = authService;
         }
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
-        {
-            var response = await _authService.RegisterAsync(request);
-            return HandleResponse(response); 
-        }
+        //[HttpPost("register")]
+        //public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
+        //{
+        //    var response = await _authService.RegisterAsync(request);
+        //    return HandleResponse(response); 
+        //}
 
         [HttpGet("confirmemail")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, string token)

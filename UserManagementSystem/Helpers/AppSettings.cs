@@ -1,4 +1,6 @@
-﻿namespace UserManagementSystem.Helpers
+﻿using System.Reflection.Metadata;
+
+namespace UserManagementSystem.Helpers
 {
 
     public static class AppSettings
@@ -30,6 +32,8 @@
         public static string ConfirmEmailUrl => _configuration["ConfirmEmailUrl"];
         // Email template
         public static string ConfirmEmailTemplate => _configuration["EmailTemplates:ConfirmEmail"];
+
+        public const string EmailHeader = "Confirm your email";
 
     }
 

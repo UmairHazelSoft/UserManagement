@@ -5,9 +5,11 @@ using UserManagementSystem.DbContext;
 using UserManagementSystem.Filters;
 using UserManagementSystem.Helpers;
 using UserManagementSystem.Models.Identity;
+using UserManagementSystem.Repositories;
 using UserManagementSystem.Sender.Email;
 using UserManagementSystem.Services.AuthService;
 using UserManagementSystem.Services.JwtService;
+using UserManagementSystem.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +67,12 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>(); // Implement for demo
+
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserService, UserService>();
+
+
 
 
 var app = builder.Build();
