@@ -15,6 +15,7 @@ namespace UserManagementSystem.Services.UserService
         Task<ApiResponse<UserResponseDto>> GetUserByIdAsync(int id) ;
         Task<IEnumerable<UserReadDto>> GetAllUsersAsync();
         //Task<PagedResult<UserReadDto>> GetPagedUsersAsync(PaginationParams pagination);
-        Task<ApiResponse<PagedResult<UserResponseDto>>> GetPagedUsersAsync();
+        //Task<ApiResponse<PagedResult<UserResponseDto>>> GetPagedUsersAsync();
+        Task<ApiResponse<PagedResult<UserResponseDto>>> GetPagedUsersAsync(GenericPaginationParams pagination);
     }
 }

@@ -29,10 +29,11 @@ namespace UserManagementSystem.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers(
             //[FromQuery] PaginationParams pagination
+            [FromQuery] GenericPaginationParams pagination
             )
         {
             //var pagedResult = await _userService.GetPagedUsersAsync(pagination);
-            var response = await _userService.GetPagedUsersAsync();
+            var response = await _userService.GetPagedUsersAsync(pagination);
 
             //return Ok(new ApiResponse<PagedResult<UserReadDto>>(
             //    true,

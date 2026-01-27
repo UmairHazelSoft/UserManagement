@@ -13,12 +13,12 @@ namespace UserManagementSystem.Services.UserService
 {
     public class UserService : IUserService
     {
-        private readonly IRepository<User> _userRepository;
+        private readonly IRepository<ApplicationUser> _userRepository;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
-        public UserService(IRepository<User> userRepository,
+        public UserService(IRepository<ApplicationUser> userRepository,
                            IMapper mapper,
                            UserManager<ApplicationUser> userManager,
                            IEmailSender emailSender, IConfiguration configuration)
@@ -56,7 +56,7 @@ namespace UserManagementSystem.Services.UserService
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var encodedToken = Uri.EscapeDataString(token);
 
-                
+
                 var confirmUrl = $"{AppSettings.ConfirmEmailUrl}?userId={user.Id}&token={encodedToken}";
 
                 // Get template from AppSettings and replace placeholder
@@ -282,66 +282,60 @@ namespace UserManagementSystem.Services.UserService
 
         public async Task<ApiResponse<PagedResult<UserResponseDto>>> GetPagedUsersAsync(
             //PaginationParams pagination
+            GenericPaginationParams pagination
             )
         {
 
-            var users = await _userManager.Users
+            try
+            {
+                var users = await _userManager.Users
                         .Where(u => !u.Deleted)
                         .ToListAsync();
 
-            // Step 1: map to DTO list
-            var userDtos = _mapper.Map<List<UserResponseDto>>(users);
+                // Step 1: map to DTO list
+                var userDtos = _mapper.Map<List<UserResponseDto>>(users);
 
-            // Step 2: wrap in PagedResult
-            var result = new PagedResult<UserResponseDto>
+                // Step 2: wrap in PagedResult
+                var result = new PagedResult<UserResponseDto>
+                {
+                    Items = userDtos,
+                    TotalCount = userDtos.Count,
+                    PageNumber = 1,
+                    PageSize = userDtos.Count
+                };
+
+
+
+                //code for filters
+
+
+                var result1 = await _userRepository.GetPagedAsync(
+                            pagination,
+                            user => _mapper.Map<UserResponseDto>(user));
+
+
+                //code for filters
+
+
+
+
+                return new ApiResponse<PagedResult<UserResponseDto>>(result1, true, "Users fetched successfully", HttpStatusCode.OK);
+
+            }
+            catch (Exception ex)
             {
-                Items = userDtos,
-                TotalCount = userDtos.Count,
-                PageNumber = 1,
-                PageSize = userDtos.Count
-            };
+                PagedResult<UserResponseDto> pagedResult = null;
+                // log exception here (ILogger)
+                return new ApiResponse<PagedResult<UserResponseDto>>(
+                    null,
+                    false,
+                    "An unexpected error occurred",
+                    HttpStatusCode.InternalServerError
+                );
+            }
 
-            return new ApiResponse<PagedResult<UserResponseDto>>(result, true, "Users fetched successfully", HttpStatusCode.OK);
+            
 
-
-            //var query = _userRepository.Query();
-            //var query = _userRepository.Query().ToListAsync();
-
-            //if (!string.IsNullOrWhiteSpace(pagination.Search))
-            //    query = query.Where(u => u.Name.Contains(pagination.Search) || u.Email.Contains(pagination.Search));
-
-            //query = pagination.SortBy?.ToLower() switch
-            //{
-            //    "name" => pagination.SortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Name) : query.OrderBy(u => u.Name),
-            //    "email" => pagination.SortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Email) : query.OrderBy(u => u.Email),
-            //    _ => query.OrderBy(u => u.Id)
-            //};
-
-
-            //var users = await query
-            //    .Skip((pagination.PageNumber - 1) * pagination.PageSize)
-            //    .Take(pagination.PageSize)
-            //    .ToListAsync();
-
-            //var totalCount = users.Count();
-
-            //return new PagedResult<UserReadDto>
-            //{
-            //    Items = _mapper.Map<IEnumerable<UserReadDto>>(users),
-            //    TotalCount = totalCount,
-            //    PageNumber = pagination.PageNumber,
-            //    PageSize = pagination.PageSize
-            //};
-
-            //return new PagedResult<UserReadDto>
-            //{
-            //    Items = _mapper.Map<IEnumerable<UserReadDto>>(query),
-            //    TotalCount = 1,
-            //    PageNumber = 1,
-            //    PageSize = 1
-            //};
-
-            return null;
         }
     }
 }

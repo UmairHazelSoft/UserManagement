@@ -1,4 +1,6 @@
-﻿namespace UserManagementSystem.Repositories
+﻿using UserManagementSystem.DTOs;
+
+namespace UserManagementSystem.Repositories
 {
     public interface IRepository<T> where T : class
     {
@@ -9,5 +11,6 @@
         void Update(T entity);
         void Remove(T entity);
         Task SaveChangesAsync();
+        Task<PagedResult<TDto>> GetPagedAsync<TDto>(GenericPaginationParams pagination, Func<T, TDto> mapToDto) where TDto : class;
     }
 }
