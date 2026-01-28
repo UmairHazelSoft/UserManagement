@@ -12,22 +12,18 @@ namespace UserManagementSystem.Services.AuthService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IJwtService _jwtService; 
-        private readonly IEmailSender _emailSender;
 
-        public AuthService(UserManager<ApplicationUser> userManager, IJwtService jwtService,
-            IEmailSender emailSender)
+        public AuthService(UserManager<ApplicationUser> userManager, IJwtService jwtService)
         {
             _userManager = userManager;
             _jwtService = jwtService;
-            _emailSender = emailSender;
         }
 
         public async Task<ApiResponse<object>> LoginAsync(LoginRequestDto request)
         {
             try
             {
-                //var user = await _userManager.FindByNameAsync(request.Username);
-
+                
                 var user = await _userManager.Users
                         .FirstOrDefaultAsync(u => u.UserName == request.Username || u.Email == request.Username);
 
@@ -63,14 +59,18 @@ namespace UserManagementSystem.Services.AuthService
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                     return new ApiResponse<object>(null, false, "Invalid user");
+                if (user.EmailConfirmed)
+                {
+                    return new ApiResponse<object>(null, false, "Email aready confirmed");
 
-                var decodedToken = WebUtility.UrlDecode(token);
+                }
+                
 
                 var result = await _userManager.ConfirmEmailAsync(user, token);
                 if (!result.Succeeded)
                     return new ApiResponse<object>(null, false, "Invalid or expired token");
 
-                // 🔐 Generate SET PASSWORD token
+                
                 var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                 return new ApiResponse<object>(

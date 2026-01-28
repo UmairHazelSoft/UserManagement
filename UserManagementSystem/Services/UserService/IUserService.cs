@@ -5,7 +5,7 @@ namespace UserManagementSystem.Services.UserService
     public interface IUserService
     {
 
-        Task<ApiResponse<object>> CreateUser(RegisterRequestDto request);
+        Task<ApiResponse<object>> CreateUserAsync(RegisterRequestDto request);
 
         Task<ApiResponse<UserResponseDto>> UpdateUserAsync(int id, UpdateUserDto userDto);
         Task<ApiResponse<UserResponseDto>> DeleteUserAsync(int id);

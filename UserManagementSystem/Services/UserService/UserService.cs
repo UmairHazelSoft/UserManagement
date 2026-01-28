@@ -27,7 +27,7 @@ namespace UserManagementSystem.Services.UserService
             _emailSender = emailSender;
         }
 
-        public async Task<ApiResponse<object>> CreateUser(RegisterRequestDto request)
+        public async Task<ApiResponse<object>> CreateUserAsync(RegisterRequestDto request)
         {
             try
             {

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using UserManagementSystem.Models.Identity;
 
@@ -30,12 +29,6 @@ namespace UserManagementSystem.DbContext
                 b.ToTable("AspNetRoles");
             });
 
-            // Rename join tables
-            //builder.Entity<IdentityUserRole<int>>().ToTable("AspNetUserRoles");
-            //builder.Entity<IdentityUserClaim<int>>().ToTable("AspNetUserClaims");
-            //builder.Entity<IdentityUserLogin<int>>().ToTable("AspNetUserLogins");
-            //builder.Entity<IdentityRoleClaim<int>>().ToTable("AspNetRoleClaims");
-            //builder.Entity<IdentityUserToken<int>>().ToTable("AspNetUserTokens");
         }
     }
 }

@@ -37,7 +37,8 @@ namespace UserManagementSystem.Sender.Email
             };
             mailMessage.To.Add(email);
 
-            client.SendMailAsync(mailMessage);
+            await client.SendMailAsync(mailMessage);
+
         }
     }
 }

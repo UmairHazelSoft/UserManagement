@@ -13,12 +13,10 @@ namespace UserManagementSystem.Controllers
     public class UsersController : BaseController
     {
         private readonly IUserService _userService;
-        private readonly IMapper _mapper;
 
-        public UsersController(IUserService userService, IMapper mapper)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
-            _mapper = mapper;
         }
 
         [HttpGet("GetAllUsers")]
@@ -55,7 +53,7 @@ namespace UserManagementSystem.Controllers
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser([FromBody] RegisterRequestDto request)
         {
-            var response = await _userService.CreateUser(request);
+            var response = await _userService.CreateUserAsync(request);
             return HandleResponse(response);
         }
 

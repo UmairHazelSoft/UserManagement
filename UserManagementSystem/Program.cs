@@ -18,16 +18,13 @@ using UserManagementSystem.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-//builder.Services.AddControllers();
 
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidateModelAttribute>(); // Apply globally
 }).ConfigureApiBehaviorOptions(options =>
 {
-    // Prevent automatic 400 responses
+    
     options.SuppressModelStateInvalidFilter = true;
 }); ;
 
@@ -36,9 +33,6 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 AppSettings.Init(builder.Configuration);
-// Add DbContext
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(AppSettings.DefaultConnection));
@@ -53,21 +47,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Add Authentication for JWT (optional)
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = "Bearer";
-//    options.DefaultChallengeScheme = "Bearer";
-//}).AddJwtBearer("Bearer", options =>
-//{
-//    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-//    {
-//        ValidateIssuer = false,
-//        ValidateAudience = false,
-//        ValidateLifetime = true,
-//        ValidateIssuerSigningKey = false,
-//    };
-//});
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -78,10 +58,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
-        //ValidateIssuer = false,
-        //ValidateAudience = false,
-        //ValidateLifetime = true,
-        //ValidateIssuerSigningKey = false,
 
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -96,8 +72,7 @@ builder.Services.AddAuthentication(options =>
     {
         OnChallenge = async context =>
         {
-            // ?? VERY IMPORTANT
-            // Stops default 401 + WWW-Authenticate header
+
             context.HandleResponse();
 
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -152,8 +127,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-
 
 app.UseAuthentication();
 app.UseAuthorization();
