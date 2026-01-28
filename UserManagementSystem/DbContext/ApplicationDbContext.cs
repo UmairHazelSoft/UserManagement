@@ -22,6 +22,12 @@ namespace UserManagementSystem.DbContext
                 b.ToTable("AspNetUsers");
                 b.Property(u => u.IsActive).HasDefaultValue(true);
                 b.Property(u => u.Deleted).HasDefaultValue(false);
+
+                b.HasIndex(u => u.UserName)
+                    .IsUnique();
+
+                b.HasIndex(u => u.Email)
+                    .IsUnique();
             });
 
             builder.Entity<ApplicationRole>(b =>
