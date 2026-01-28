@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using UserManagementSystem.DTOs;
@@ -17,21 +16,17 @@ namespace UserManagementSystem.Services.UserService
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
-        private readonly IConfiguration _configuration;
         public UserService(IRepository<ApplicationUser> userRepository,
                            IMapper mapper,
                            UserManager<ApplicationUser> userManager,
-                           IEmailSender emailSender, IConfiguration configuration)
+                           IEmailSender emailSender)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _userManager = userManager;
             _emailSender = emailSender;
-            _configuration = configuration;
         }
 
-
-        //Create User
         public async Task<ApiResponse<object>> CreateUser(RegisterRequestDto request)
         {
             try
@@ -62,15 +57,12 @@ namespace UserManagementSystem.Services.UserService
                 // Get template from AppSettings and replace placeholder
                 var emailBody = AppSettings.ConfirmEmailTemplate.Replace("{ConfirmUrl}", confirmUrl);
 
-                // 📧 SEND EMAIL
-                await _emailSender.SendEmailAsync(
+                 _emailSender.SendEmailAsync(
                     user.Email,
                     AppSettings.EmailHeader,
                     emailBody
                 );
-                // TODO: Send email using SMTP (MailKit or SmtpClient)
-                Console.WriteLine($"Confirm email link: {confirmUrl}");
-
+                
                 return new ApiResponse<object>(null, true, "User registered. Check email to confirm.");
             }
             catch (Exception ex)
@@ -80,48 +72,6 @@ namespace UserManagementSystem.Services.UserService
 
         }
 
-
-
-
-
-
-        public async Task<UserReadDto> CreateUserAsync(CreateUserDto userDto)
-        {
-            //var identityUser = new IdentityUser
-            //{
-            //    UserName = userDto.Email,
-            //    Email = userDto.Email
-            //};
-
-            //var result = await _userManager.CreateAsync(identityUser);
-            //if (!result.Succeeded)
-            //    throw new Exception("Failed to create Identity user");
-
-            //var token = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
-            //var confirmationLink = _configuration["ConfirmEmailUrl"] + $"?userId={identityUser.Id}&token={Uri.EscapeDataString(token)}";
-
-            //await _emailSender.SendEmailAsync(identityUser.Email, "Confirm your email", confirmationLink);
-
-            //var user = _mapper.Map<User>(userDto);
-            //await _userRepository.AddAsync(user);
-            //await _userRepository.SaveChangesAsync();
-
-            //return _mapper.Map<UserReadDto>(user);
-
-            return null;
-        }
-
-        //public async Task<UserReadDto?> UpdateUserAsync(int id, UpdateUserDto userDto)
-        //{
-        //    var user = await _userRepository.GetByIdAsync(id);
-        //    if (user == null) return null;
-
-        //    _mapper.Map(userDto, user);
-        //    _userRepository.Update(user);
-        //    await _userRepository.SaveChangesAsync();
-
-        //    return _mapper.Map<UserReadDto>(user);
-        //}
 
         public async Task<ApiResponse<UserResponseDto>> UpdateUserAsync(int id, UpdateUserDto userDto)
         {
@@ -151,7 +101,7 @@ namespace UserManagementSystem.Services.UserService
                 // Map only allowed fields
                 _mapper.Map(userDto, user);
 
-                // Save changes using UserManager
+              
                 var updateResult = await _userManager.UpdateAsync(user);
 
                 if (!updateResult.Succeeded)
@@ -170,20 +120,11 @@ namespace UserManagementSystem.Services.UserService
         }
 
 
-        //public async Task<bool> DeleteUserAsync(int id)
-        //{
-        //    var user = await _userRepository.GetByIdAsync(id);
-        //    if (user == null) return false;
-
-        //    _userRepository.Remove(user);
-        //    await _userRepository.SaveChangesAsync();
-        //    return true;
-        //}
         public async Task<ApiResponse<UserResponseDto>> DeleteUserAsync(int id)
         {
             try
             {
-                // Find the user who is not already deleted
+                
                 var user = await _userManager.Users
                     .FirstOrDefaultAsync(u => !u.Deleted && u.Id == id);
 
@@ -197,10 +138,8 @@ namespace UserManagementSystem.Services.UserService
                     );
                 }
 
-                // Set Deleted flag to true (soft delete)
                 user.Deleted = true;
 
-                // Save changes using UserManager
                 var result = await _userManager.UpdateAsync(user);
 
                 if (!result.Succeeded)
@@ -274,67 +213,28 @@ namespace UserManagementSystem.Services.UserService
         }
 
 
-        public async Task<IEnumerable<UserReadDto>> GetAllUsersAsync()
-        {
-            var users = await _userRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<UserReadDto>>(users);
-        }
-
-        public async Task<ApiResponse<PagedResult<UserResponseDto>>> GetPagedUsersAsync(
-            //PaginationParams pagination
-            GenericPaginationParams pagination
-            )
+        public async Task<ApiResponse<PagedResult<UserResponseDto>>> GetPagedUsersAsync(GenericPaginationParams pagination)
         {
 
             try
             {
-                var users = await _userManager.Users
-                        .Where(u => !u.Deleted)
-                        .ToListAsync();
-
-                // Step 1: map to DTO list
-                var userDtos = _mapper.Map<List<UserResponseDto>>(users);
-
-                // Step 2: wrap in PagedResult
-                var result = new PagedResult<UserResponseDto>
-                {
-                    Items = userDtos,
-                    TotalCount = userDtos.Count,
-                    PageNumber = 1,
-                    PageSize = userDtos.Count
-                };
-
-
-
-                //code for filters
-
-
-                var result1 = await _userRepository.GetPagedAsync(
+               
+                var result = await _userRepository.GetPagedAsync(
                             pagination,
                             user => _mapper.Map<UserResponseDto>(user));
 
-
-                //code for filters
-
-
-
-
-                return new ApiResponse<PagedResult<UserResponseDto>>(result1, true, "Users fetched successfully", HttpStatusCode.OK);
+                return new ApiResponse<PagedResult<UserResponseDto>>(result, true, "Users fetched successfully", HttpStatusCode.OK);
 
             }
             catch (Exception ex)
             {
-                PagedResult<UserResponseDto> pagedResult = null;
-                // log exception here (ILogger)
                 return new ApiResponse<PagedResult<UserResponseDto>>(
                     null,
                     false,
                     "An unexpected error occurred",
                     HttpStatusCode.InternalServerError
                 );
-            }
-
-            
+            }      
 
         }
     }

@@ -7,6 +7,5 @@ namespace UserManagementSystem.Services.AuthService
         Task<ApiResponse<object>> LoginAsync(LoginRequestDto request);
         Task<ApiResponse<object>> ConfirmEmailAsync(string userId, string token);
         Task<ApiResponse<object>> SetPasswordAsync(SetPasswordDto request);
-        Task<ApiResponse<object>> RegisterAsync(RegisterRequestDto request);
     }
 }

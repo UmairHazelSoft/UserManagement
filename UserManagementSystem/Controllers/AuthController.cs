@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using UserManagementSystem.Controllers.Base;
 using UserManagementSystem.DTOs;
 using UserManagementSystem.Services.AuthService;
@@ -7,6 +8,7 @@ namespace UserManagementSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [AllowAnonymous]
     public class AuthController : BaseController
     {
         
@@ -16,12 +18,7 @@ namespace UserManagementSystem.Controllers
         {
             _authService = authService;
         }
-        //[HttpPost("register")]
-        //public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
-        //{
-        //    var response = await _authService.RegisterAsync(request);
-        //    return HandleResponse(response); 
-        //}
+
 
         [HttpGet("confirmemail")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, string token)
@@ -37,6 +34,7 @@ namespace UserManagementSystem.Controllers
             var response = await _authService.SetPasswordAsync(request);
             return HandleResponse(response); 
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {

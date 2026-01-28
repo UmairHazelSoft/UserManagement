@@ -1,9 +1,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Net;
+using System.Text;
 using UserManagementSystem.DbContext;
+using UserManagementSystem.DTOs;
 using UserManagementSystem.Filters;
 using UserManagementSystem.Helpers;
+using UserManagementSystem.Middleware;
 using UserManagementSystem.Models.Identity;
 using UserManagementSystem.Repositories;
 using UserManagementSystem.Sender.Email;
@@ -49,20 +54,82 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     .AddDefaultTokenProviders();
 
 // Add Authentication for JWT (optional)
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = "Bearer";
+//    options.DefaultChallengeScheme = "Bearer";
+//}).AddJwtBearer("Bearer", options =>
+//{
+//    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+//    {
+//        ValidateIssuer = false,
+//        ValidateAudience = false,
+//        ValidateLifetime = true,
+//        ValidateIssuerSigningKey = false,
+//    };
+//});
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = "Bearer";
     options.DefaultChallengeScheme = "Bearer";
-}).AddJwtBearer("Bearer", options =>
+})
+.AddJwtBearer("Bearer", options =>
 {
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
+        //ValidateIssuer = false,
+        //ValidateAudience = false,
+        //ValidateLifetime = true,
+        //ValidateIssuerSigningKey = false,
+
+        ValidateIssuer = true,
+        ValidateAudience = true,
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = false,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = AppSettings.JwtIssuer,
+        ValidAudience = AppSettings.JwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AppSettings.JwtKey))
+    };
+
+    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
+        OnChallenge = async context =>
+        {
+            // ?? VERY IMPORTANT
+            // Stops default 401 + WWW-Authenticate header
+            context.HandleResponse();
+
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+
+            var response = new ApiResponse<object>(
+                null,
+                false,
+                "Unauthorized - Authentication required",
+                HttpStatusCode.Unauthorized
+            );
+
+            await context.Response.WriteAsJsonAsync(response);
+        },
+
+        OnForbidden = async context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+
+            var response = new ApiResponse<object>(
+                null,
+                false,
+                "Forbidden - You do not have permission to access this resource",
+                HttpStatusCode.Forbidden
+            );
+
+            await context.Response.WriteAsJsonAsync(response);
+        }
     };
 });
+
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -86,7 +153,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ApiResponseMiddleware>();
+
 
 app.MapControllers();
 

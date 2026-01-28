@@ -35,13 +35,6 @@ namespace UserManagementSystem.Repositories
         public async Task SaveChangesAsync() => await _dbContext.SaveChangesAsync();
 
 
-
-
-
-
-
-
-
         public async Task<PagedResult<TDto>> GetPagedAsync<TDto>(
             GenericPaginationParams pagination,
             Func<T, TDto> mapToDto
@@ -51,12 +44,10 @@ namespace UserManagementSystem.Repositories
             {
                 IQueryable<T> query = _dbSet.AsQueryable();
 
-                // 1️⃣ Decode filters if provided
                 List<GenericFilter> filters = new();
                 if (!string.IsNullOrEmpty(pagination.Base64Filters))
                 {
                     var json = Encoding.UTF8.GetString(Convert.FromBase64String(pagination.Base64Filters));
-                   // filters = JsonSerializer.Deserialize<List<GenericFilter>>(json) ?? new List<GenericFilter>();
 
                     var options = new JsonSerializerOptions
                     {
@@ -68,7 +59,7 @@ namespace UserManagementSystem.Repositories
                               ?? new List<GenericFilter>();
                 }
 
-                // 2️⃣ Apply filters dynamically
+               
                 foreach (var filter in filters)
                 {
                     if (string.IsNullOrEmpty(filter.Column) || string.IsNullOrEmpty(filter.Value))
@@ -79,10 +70,6 @@ namespace UserManagementSystem.Repositories
                     var constant = Expression.Constant(filter.Value);
                     Expression? predicate = null;
 
-                    //if (!Enum.TryParse<FilterOperatorEnum>(filter.Operator, true, out var op))
-                    //{
-                    //    continue; // invalid operator, skip safely
-                    //}
 
                     if (property.Type == typeof(string))
                     {
@@ -124,7 +111,6 @@ namespace UserManagementSystem.Repositories
                     }
                 }
 
-                // 3️⃣ Apply sorting
                 if (!string.IsNullOrEmpty(pagination.SortColumn))
                 {
                     var parameter = Expression.Parameter(typeof(T), "x");
@@ -144,16 +130,16 @@ namespace UserManagementSystem.Repositories
                     query = query.Provider.CreateQuery<T>(resultExp);
                 }
 
-                // 4️⃣ Get total count before pagination
+                
                 var totalCount = await query.CountAsync();
 
-                // 5️⃣ Apply pagination
+               
                 var items = await query
                     .Skip((pagination.PageNumber - 1) * pagination.PageSize)
                     .Take(pagination.PageSize)
                     .ToListAsync();
 
-                // 6️⃣ Map to DTO
+                
                 var dtoItems = items.Select(mapToDto).ToList();
 
                 return new PagedResult<TDto>
