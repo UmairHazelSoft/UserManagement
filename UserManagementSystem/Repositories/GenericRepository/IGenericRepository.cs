@@ -1,8 +1,8 @@
 ﻿using UserManagementSystem.DTOs;
 
-namespace UserManagementSystem.Repositories
+namespace UserManagementSystem.Repositories.GenericRepository
 {
-    public interface IRepository<T> where T : class
+    public interface IGenericRepository<T> where T : class
     {
         IQueryable<T> Query();
         Task<IEnumerable<T>> GetAllAsync();
@@ -11,6 +11,6 @@ namespace UserManagementSystem.Repositories
         void Update(T entity);
         void Remove(T entity);
         Task SaveChangesAsync();
-        Task<PagedResult<TDto>> GetPagedAsync<TDto>(GenericPaginationParams pagination, Func<T, TDto> mapToDto) where TDto : class;
+        Task<PagedResultDto<T>> GetPagedAsync(GenericPaginationParams pagination) ;
     }
 }

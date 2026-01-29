@@ -3,12 +3,13 @@
     using System.Net;
     using System.Text.Json;
     using UserManagementSystem.DTOs;
+    using UserManagementSystem.Helpers;
 
-    public class ApiResponseMiddleware
+    public class ApiRouteNotFoundMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public ApiResponseMiddleware(RequestDelegate next)
+        public ApiRouteNotFoundMiddleware(RequestDelegate next)
         {
             _next = next;
         }
@@ -27,8 +28,7 @@
                     var response = new ApiResponse<object>(
                         null,
                         false,
-                        "Resource not found",
-                        HttpStatusCode.NotFound
+                        AppSettings.ResourceNotFound
                     );
 
                     await context.Response.WriteAsync(JsonSerializer.Serialize(response));
@@ -42,8 +42,7 @@
                 var response = new ApiResponse<object>(
                     null,
                     false,
-                    "An unexpected server error occurred",
-                    HttpStatusCode.InternalServerError
+                    AppSettings.ErrorOccurred
                 );
 
                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));

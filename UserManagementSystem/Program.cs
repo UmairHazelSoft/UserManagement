@@ -10,7 +10,7 @@ using UserManagementSystem.Filters;
 using UserManagementSystem.Helpers;
 using UserManagementSystem.Middleware;
 using UserManagementSystem.Models.Identity;
-using UserManagementSystem.Repositories;
+using UserManagementSystem.Repositories.GenericRepository;
 using UserManagementSystem.Sender.Email;
 using UserManagementSystem.Services.AuthService;
 using UserManagementSystem.Services.JwtService;
@@ -29,13 +29,13 @@ builder.Services.AddControllers(options =>
 }); ;
 
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-AppSettings.Init(builder.Configuration);
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(AppSettings.DefaultConnection));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure Identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -63,9 +63,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = AppSettings.JwtIssuer,
-        ValidAudience = AppSettings.JwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AppSettings.JwtKey))
+        ValidIssuer = builder.Configuration[AppSettings.JwtIssuer],
+        ValidAudience = builder.Configuration[AppSettings.JwtAudience],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration[AppSettings.JwtKey]))
     };
 
     options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
@@ -81,8 +81,7 @@ builder.Services.AddAuthentication(options =>
             var response = new ApiResponse<object>(
                 null,
                 false,
-                "Unauthorized - Authentication required",
-                HttpStatusCode.Unauthorized
+                AppSettings.UnAuthoriized
             );
 
             await context.Response.WriteAsJsonAsync(response);
@@ -96,8 +95,7 @@ builder.Services.AddAuthentication(options =>
             var response = new ApiResponse<object>(
                 null,
                 false,
-                "Forbidden - You do not have permission to access this resource",
-                HttpStatusCode.Forbidden
+                AppSettings.Forbidden
             );
 
             await context.Response.WriteAsJsonAsync(response);
@@ -108,10 +106,10 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IEmailSender, EmailSender>(); // Implement for demo
+builder.Services.AddScoped<IEmailSender, EmailSender>(); 
 
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 
 
@@ -131,7 +129,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<ApiResponseMiddleware>();
+app.UseMiddleware<ApiRouteNotFoundMiddleware>();
 
 
 app.MapControllers();

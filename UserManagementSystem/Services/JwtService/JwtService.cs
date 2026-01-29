@@ -1,26 +1,24 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserManagementSystem.Helpers;
-using UserManagementSystem.Models;
 using UserManagementSystem.Models.Identity;
 namespace UserManagementSystem.Services.JwtService
 {
     public class JwtService : IJwtService
     {
-        
 
-        public JwtService()
+        private  IConfiguration _configuration;
+        public JwtService(IConfiguration configuration)
         {
-            
+            _configuration = configuration;
         }
 
         public string GenerateToken(ApplicationUser user)
         {
             
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AppSettings.JwtKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[AppSettings.JwtKey]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             // Add claims
@@ -32,10 +30,10 @@ namespace UserManagementSystem.Services.JwtService
         };
 
             var token = new JwtSecurityToken(
-                issuer: AppSettings.JwtIssuer ,
-                audience: AppSettings.JwtAudience ,
+                issuer: _configuration[AppSettings.JwtIssuer] ,
+                audience: _configuration[AppSettings.JwtAudience] ,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(AppSettings.JwtDurationInMinutes)),
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration[AppSettings.JwtDurationInMinutes] ?? "60")),
                 signingCredentials: creds
             );
 

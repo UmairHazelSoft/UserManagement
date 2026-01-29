@@ -8,19 +8,20 @@ namespace UserManagementSystem.Sender.Email
 {
     public class EmailSender : IEmailSender
     {
-
-        public EmailSender()
+        private IConfiguration _configuration;
+        public EmailSender(IConfiguration configuration)
         {
+            _configuration = configuration;
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             
-            string smtpHost = AppSettings.SmtpHost ;
-            int smtpPort = AppSettings.SmtpPort;
-            string smtpUser = AppSettings.SmtpUser;
-            string smtpPass = AppSettings.SmtpPass;
-            string fromEmail = AppSettings.FromEmail;
+            string smtpHost = _configuration[AppSettings.SmtpHost] ;
+            int smtpPort =    int.Parse(_configuration[AppSettings.SmtpPort] ?? "587"); ;
+            string smtpUser = _configuration[AppSettings.SmtpUser];
+            string smtpPass = _configuration[AppSettings.SmtpPass];
+            string fromEmail = _configuration[AppSettings.FromEmail];
 
         using var client = new SmtpClient(smtpHost, smtpPort)
             {

@@ -5,35 +5,35 @@ namespace UserManagementSystem.Helpers
 
     public static class AppSettings
     {
-        private static IConfiguration _configuration;
-
-        public static void Init(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        
 
         // Connection String
-        public static string DefaultConnection => _configuration.GetConnectionString("DefaultConnection");
+        public const string DefaultConnection = "DefaultConnection";
 
         // JWT Settings
-        public static string JwtKey => _configuration["Jwt:Key"];
-        public static string JwtIssuer => _configuration["Jwt:Issuer"];
-        public static string JwtAudience => _configuration["Jwt:Audience"];
-        public static int JwtDurationInMinutes => int.Parse(_configuration["Jwt:DurationInMinutes"] ?? "60");
+        public const string JwtKey ="Jwt:Key";
+        public const string JwtIssuer ="Jwt:Issuer";
+        public const string JwtAudience ="Jwt:Audience";
+        public const string JwtDurationInMinutes = "Jwt:DurationInMinutes";
 
         // Email Settings
-        public static string SmtpHost => _configuration["Email:SmtpHost"];
-        public static int SmtpPort => int.Parse(_configuration["Email:SmtpPort"] ?? "587");
-        public static string SmtpUser => _configuration["Email:SmtpUser"];
-        public static string SmtpPass => _configuration["Email:SmtpPass"];
-        public static string FromEmail => _configuration["Email:FromEmail"];
+        public const string SmtpHost ="Email:SmtpHost";
+        public const string SmtpPort = "Email:SmtpPort";
+        public const string SmtpUser ="Email:SmtpUser";
+        public const string SmtpPass ="Email:SmtpPass";
+        public const string FromEmail ="Email:FromEmail";
 
         // Confirm Email URL
-        public static string ConfirmEmailUrl => _configuration["ConfirmEmailUrl"];
+        public static string ConfirmEmailUrl ="ConfirmEmailUrl";
         // Email template
-        public static string ConfirmEmailTemplate => _configuration["EmailTemplates:ConfirmEmail"];
+        public const string ConfirmEmailTemplate ="EmailTemplates:ConfirmEmail";
 
         public const string EmailHeader = "Confirm your email";
+        public const string UnAuthoriized = "Unauthorized - Authentication required";
+        public const string Forbidden = "Forbidden - You do not have permission to access this resource";
+
+        public const string ResourceNotFound = "Resource not found";
+        public const string ErrorOccurred = "An unexpected server error occurred";
 
     }
 

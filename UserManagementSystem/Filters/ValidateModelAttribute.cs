@@ -17,7 +17,7 @@ namespace UserManagementSystem.Filters
                     .SelectMany(kvp => kvp.Value.Errors.Select(e => $"{kvp.Key}: {e.ErrorMessage}"))
                     .ToList();
 
-                var combinedMessage = string.Join("; ", errorMessages);
+                var combinedMessage = string.Join(", ", errorMessages);
 
                 var response = new ApiResponse<object>(
                     data: null,

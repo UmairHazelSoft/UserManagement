@@ -20,26 +20,50 @@ namespace UserManagementSystem.Controllers
         }
 
 
-        [HttpGet("confirmemail")]
+        [HttpGet("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, string token)
         {
-            var response = await _authService.ConfirmEmailAsync(userId,token);
-            return HandleResponse(response);
+            try
+            {
+                var response = await _authService.ConfirmEmailAsync(userId, token);
+                return Ok(response);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
-        [HttpPost("setpassword")]
+        [HttpPost("SetPassword")]
         public async Task<IActionResult> SetPassword([FromBody] SetPasswordDto request)
         {
-            var response = await _authService.SetPasswordAsync(request);
-            return HandleResponse(response); 
+            try
+            {
+                var response = await _authService.SetPasswordAsync(request);
+                return Ok(response);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
-            var response = await _authService.LoginAsync(request);
-            return HandleResponse(response); 
+            try
+            {
+                var response = await _authService.LoginAsync(request);
+                return Ok(response);
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 

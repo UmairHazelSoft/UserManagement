@@ -10,17 +10,14 @@ namespace UserManagementSystem.DTOs
         public string Message { get; set; }    
         public T Data { get; set; }            
 
-        [JsonIgnore] 
-        public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
 
         public ApiResponse() { }
 
-        public ApiResponse(T data, bool success = true, string message = "", HttpStatusCode statusCode = HttpStatusCode.OK)
+        public ApiResponse(T data, bool success = true, string message = "")
         {
             Data = data;
             Success = success;
             Message = message;
-            StatusCode = statusCode;
         }
     }
 }
