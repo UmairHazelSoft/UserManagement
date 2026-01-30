@@ -63,7 +63,7 @@ namespace UserManagementSystem.Services.UserService
             // Get template from AppSettings and replace placeholder
             var emailBody = _configuration[AppSettings.ConfirmEmailTemplate].Replace("{ConfirmUrl}", confirmUrl);
 
-            _emailSender.SendEmailAsync(user.Email, _configuration[AppSettings.EmailHeader], emailBody);
+            // _emailSender.SendEmailAsync(user.Email, _configuration[AppSettings.EmailHeader], emailBody);
 
             return userCreated;
 
@@ -139,19 +139,21 @@ namespace UserManagementSystem.Services.UserService
             return userDto;
         }
 
-
-
         public async Task<PagedResultDto<UserResponseDto>> GetPagedUsersAsync(GenericPaginationParams pagination)
         {
-            var users = await _userRepository.GetPagedAsync(pagination);
-            var result = new PagedResultDto<UserResponseDto>
+            
+            var query = _userRepository.Query();
+
+            var pagedUsers = await query.ApplyPagingAsync(pagination);
+
+            return new PagedResultDto<UserResponseDto>
             {
-                Items = _mapper.Map<IEnumerable<UserResponseDto>>(users.Items),
-                TotalCount = users.TotalCount,
-                PageNumber = users.PageNumber,
-                PageSize = users.PageSize
+                Items = _mapper.Map<IEnumerable<UserResponseDto>>(pagedUsers.Items),
+                TotalCount = pagedUsers.TotalCount,
+                PageNumber = pagedUsers.PageNumber,
+                PageSize = pagedUsers.PageSize
             };
-            return result;
         }
+
     }
 }

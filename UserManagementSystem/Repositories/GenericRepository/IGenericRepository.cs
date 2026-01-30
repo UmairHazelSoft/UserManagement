@@ -11,6 +11,5 @@ namespace UserManagementSystem.Repositories.GenericRepository
         void Update(T entity);
         void Remove(T entity);
         Task SaveChangesAsync();
-        Task<PagedResultDto<T>> GetPagedAsync(GenericPaginationParams pagination) ;
     }
 }
