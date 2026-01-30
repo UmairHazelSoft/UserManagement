@@ -65,7 +65,7 @@ namespace UserManagementSystem.Services.UserService
             // Get template from AppSettings and replace placeholder
             var emailBody = _configuration[AppSettings.ConfirmEmailTemplate].Replace("{ConfirmUrl}", confirmUrl);
 
-            // _emailSender.SendEmailAsync(user.Email, _configuration[AppSettings.EmailHeader], emailBody);
+            _emailSender.SendEmailAsync(user.Email, _configuration[AppSettings.EmailHeader], emailBody);
 
             return userCreated;
 

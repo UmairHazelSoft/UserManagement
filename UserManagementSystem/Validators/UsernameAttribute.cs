@@ -8,7 +8,7 @@ namespace UserManagementSystem.Validators
     public class UsernameAttribute : ValidationAttribute
     {
         private static readonly Regex _regex =
-            new(@"^[a-zA-Z](?!.*__)[a-zA-Z0-9_]{1,18}[a-zA-Z0-9]$", RegexOptions.Compiled);
+            new Regex(@"^[a-zA-Z](?!.*__)(?!.*@.*@)[a-zA-Z0-9_@]{1,18}[a-zA-Z0-9]$", RegexOptions.Compiled);
 
         protected override ValidationResult? IsValid(
             object? value,
@@ -20,6 +20,9 @@ namespace UserManagementSystem.Validators
 
             if (value is not string username)
                 return new ValidationResult("Invalid username value.");
+
+            if (value is "")
+                return ValidationResult.Success;
 
             if (!_regex.IsMatch(username))
                 return new ValidationResult(

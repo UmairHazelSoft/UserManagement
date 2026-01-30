@@ -23,6 +23,9 @@ namespace UserManagementSystem.CustomValidators
             if (value is not string email)
                 return new ValidationResult("Email value must be a string.");
 
+            if (value is "")
+                return ValidationResult.Success;
+
             // Split by '@' to ensure exactly one @
             var parts = email.Split('@');
             if (parts.Length != 2)
@@ -55,6 +58,9 @@ namespace UserManagementSystem.CustomValidators
 
         private bool IsValidDomainPart(string part)
         {
+            if (part.Length < 2)
+                return false;
+
             foreach (char c in part)
             {
                 if (!char.IsLetterOrDigit(c) && c != '-')
