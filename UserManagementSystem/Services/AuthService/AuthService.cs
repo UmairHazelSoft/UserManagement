@@ -23,7 +23,7 @@ namespace UserManagementSystem.Services.AuthService
             var user = await _userManager.Users
                     .FirstOrDefaultAsync(u => u.UserName == request.Username || u.Email == request.Username);
 
-            if (user == null || !user.IsActive || user.Deleted)
+            if (user == null || !user.IsActive || user.IsDeleted)
             {
                 throw new Exception("Invalid credentials or inactive user");
             }

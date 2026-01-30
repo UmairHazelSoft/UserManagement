@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using UserManagementSystem.DTOs;
+using UserManagementSystem.Enums;
 using UserManagementSystem.Helpers;
 using UserManagementSystem.Models.Identity;
 using UserManagementSystem.Repositories.GenericRepository;
@@ -29,7 +30,7 @@ namespace UserManagementSystem.Services.UserService
             _configuration = configuration;
         }
 
-        public async Task<bool> CreateUserAsync(RegisterRequestDto request)
+        public async Task<bool> CreateUserAsync(RegisterRequestDto request, RoleEnum role = RoleEnum.User)
         {
             bool userCreated = false;
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
@@ -43,7 +44,8 @@ namespace UserManagementSystem.Services.UserService
                 UserName = request.Username,
                 Email = request.Email,
                 IsActive = true,
-                Deleted = false
+                IsDeleted = false,
+                RoleId = (int)role
             };
 
             var result = await _userManager.CreateAsync(user);
@@ -74,7 +76,7 @@ namespace UserManagementSystem.Services.UserService
         {
             // Get user from Identity
             var user = await _userManager.Users
-                .FirstOrDefaultAsync(u => !u.Deleted && u.Id == id);
+                .FirstOrDefaultAsync(u => !u.IsDeleted && u.Id == id);
 
             if (user == null)
             {
@@ -103,14 +105,14 @@ namespace UserManagementSystem.Services.UserService
         {
             bool deleted = false;
             var user = await _userManager.Users
-                .FirstOrDefaultAsync(u => !u.Deleted && u.Id == id);
+                .FirstOrDefaultAsync(u => !u.IsDeleted && u.Id == id);
 
             if (user == null)
             {
                 throw new Exception("User not found or already deleted");
             }
 
-            user.Deleted = true;
+            user.IsDeleted = true;
             var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)
@@ -127,7 +129,7 @@ namespace UserManagementSystem.Services.UserService
         public async Task<UserResponseDto> GetUserByIdAsync(int id)
         {
             var user = await _userManager.Users
-                .FirstOrDefaultAsync(u => !u.Deleted && u.Id == id);
+                .FirstOrDefaultAsync(u => !u.IsDeleted && u.Id == id);
 
             if (user == null)
             {

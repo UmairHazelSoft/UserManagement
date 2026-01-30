@@ -35,7 +35,7 @@ namespace UserManagementSystem.Helpers
         public const string ResourceNotFound = "Resource not found";
         public const string ErrorOccurred = "An unexpected server error occurred";
 
-        public const string Deleted = "Deleted";
+        public const string Deleted = "IsDeleted";
 
     }
 
